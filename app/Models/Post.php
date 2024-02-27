@@ -2,16 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Post {
-    public static function find($slug) {
+class Post extends Model
+{
+    use HasFactory;
 
-        if (! file_exists($path = resource_path("posts/{$slug}.html"))) {
-            abort(404);
-        }
+    protected $guarded = []; 
+    // protected $fillable = ['title', 'excerpt', 'body', 'category_id']; //fillable property specifies which attributes can be mass assigned aka all attributes passed in bulk
 
+    protected $with = ['category', 'author'];
+    
+    public function category() {
+        // hasOne, hasMany, belongsTo, belongsToMany
+        return $this->belongsTo(Category::class);
+    }
 
-        return cache()->remember("posts.{$slug}", 1200, fn() => file_get_contents($path));
-
+    public function author() {
+        // hasOne, hasMany, belongsTo, belongsToMany
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
